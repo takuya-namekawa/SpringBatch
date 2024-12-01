@@ -1,6 +1,7 @@
 package com.batch.config;
 
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParametersValidator;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -13,6 +14,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import com.batch.validator.Tasklet1JobParametersValidator;
 
 /**
  * 設定クラス
@@ -32,6 +35,10 @@ public class SpringConfig {
 	@Qualifier("Tasklet1")
 	private Tasklet Tasklet1;
 	
+	@Autowired
+	@Qualifier("Tasklet2")
+	private Tasklet Tasklet2;
+	
 	
 	public SpringConfig(JobLauncher jobLauncher, JobRepository jobRepository,
 			PlatformTransactionManager platformTransactionManager) {
@@ -39,6 +46,13 @@ public class SpringConfig {
 		this.jobRepository = jobRepository;
 		this.platformTransactionManager = platformTransactionManager;
 	}
+	
+	// 検証クラスの呼び出し
+	@Bean
+	public JobParametersValidator jobParametersValidator() {
+		return new Tasklet1JobParametersValidator();
+	}
+	
 	
 	// Stepを定義する
 	@Bean
@@ -50,6 +64,16 @@ public class SpringConfig {
 				.build();
 	}
 	
+	// Stepを定義する
+		@Bean
+		public Step tasklet1Step2() {
+			// 第一引数はStep名を定義する
+			return new StepBuilder("tasklet1Step2" , jobRepository)
+					// Taskletを指定する
+					.tasklet(Tasklet2 , platformTransactionManager)
+					.build();
+		}
+	
 	// Jobを定義する
 	@Bean
 	public Job tasklet1Job1() {
@@ -59,6 +83,9 @@ public class SpringConfig {
 				.incrementer(new RunIdIncrementer())
 				// 実行するStepを指定する
 				.start(tasklet1Step1())
+				.next(tasklet1Step2())
+				// 検証する
+				.validator(jobParametersValidator())
 				.build();
 	}
 	
