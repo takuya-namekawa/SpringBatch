@@ -9,9 +9,12 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
 
 @Component("Tasklet1")
 @StepScope
+@Slf4j
 public class Tasklet1 implements Tasklet{
 	
 	// Jobにパラメーターを設定する
@@ -24,11 +27,11 @@ public class Tasklet1 implements Tasklet{
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		
-		System.out.println("Tasklet1の出力です");
+		log.info("Tasklet1の出力です");
 		
 		// Jobパラメータを出力する
-		System.out.println("StringParamの値は" + StringParam);
-		System.out.println("IntegerParamの値は" + IntegerParam);
+		log.info("StringParam={}" + StringParam);
+		log.info("IntegerParam={}" + IntegerParam);
 		
 		// JobExecutionContextを定義する
 		ExecutionContext jobContext = contribution.getStepExecution()

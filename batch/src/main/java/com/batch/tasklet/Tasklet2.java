@@ -8,8 +8,11 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component("Tasklet2")
 @StepScope
+@Slf4j
 public class Tasklet2 implements Tasklet{
 	
 	// Tasklet1から受け取る値をキーで指定する
@@ -19,8 +22,8 @@ public class Tasklet2 implements Tasklet{
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		
-		System.out.println("Tasklet2の出力です");
-		System.out.println("Tasklet1から受け取った値 : " + tasklet1JobValue1);
+		log.info("Tasklet2の出力です");
+		log.info("tasklet1JobValue1={}" + tasklet1JobValue1);
 		
 		return RepeatStatus.FINISHED;
 	}
